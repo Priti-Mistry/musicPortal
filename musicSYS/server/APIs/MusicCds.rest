@@ -1,0 +1,16 @@
+POST  http://localhost:5000/MusicCds/add
+Content-Type: application/json
+
+{
+    "album_name":"album",
+    "singer":"arijit",
+    "composer_name":"arijit",
+    "launch_date":"01/01/2024",
+    "place":"surat", 
+    "genre":"sad",
+    "record_label":"label1", 
+    "total_track":"5",
+    "duration":"00:02:55", 
+    "format":".mp4",
+    "price":450
+}
