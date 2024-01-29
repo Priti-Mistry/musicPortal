@@ -1,23 +1,16 @@
-import { Col, Row , Button} from 'antd';
-import {PlusOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import AllMusicList from './AllMusicList';
+import {  Carousel } from 'antd';
+import './style.css'
 
 function Home() {
+
   return (
     <>
-    <Row>
-      <Button type="primary" icon={<PlusOutlined />} size={'small'}>
-            <Link 
-              to="addMusic"
-            >Add</Link>
-      </Button>
-      </Row>
-      <Row>
-      <Col span={24}>
-      <AllMusicList/>
-      </Col>
-      </Row>
+      <Carousel >
+      <div className='contentStyle'>
+        <h3>Sell your Music CD here</h3>
+      </div>
+      
+    </Carousel>
     </>
   )
 }

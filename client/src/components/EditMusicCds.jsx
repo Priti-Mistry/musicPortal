@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   DatePicker,
@@ -8,49 +10,86 @@ import {
   TimePicker,
   InputNumber,
 } from "antd";
-import {  useState } from "react";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useDispatch } from "react-redux";
-import { addMusicCd } from "../redux/MusicCds/MusicCdsSlice";
-import { useNavigate, useParams } from "react-router-dom";
-import './style.css'
+import moment from 'moment'
+import dayjs from 'dayjs'
+import { useDispatch, useSelector } from "react-redux";
+import { editMusicCd, singleMusicData } from "../redux/MusicCds/MusicCdsSlice";
 
-function AddMusicCDs() {
-  dayjs.extend(customParseFormat);
-  const navigate = useNavigate();
+function EditMusicCds() {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.musicCd.musicCdsDetail);
+  console.log("data length : ",data.length)
   const [formData, setFormData] = useState({
     album_name: "",
     singer: "",
     composer_name: "",
     launch_date: "",
     place: "",
-    genre: '',
+    genre: "",
     record_label: "",
     total_track: "",
     duration: 0,
-    format: '',
+    format: "",
     price: 0,
   });
-  const { id } = useParams();
-  const dispatch = useDispatch()
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(singleMusicData(id));
+    console.log(data);
+  }, []);
 
 
+  useEffect(() => {
+    data &&
+      data.map((d) => {
+        if (d.id === Number(id)) {
+          setFormData({
+            album_name: d.album_name,
+            singer: d.singer,
+            composer_name: d.composer_name,
+            launch_date: d.launch_date,
+            place: d.place,
+            genre: d.genre,
+            record_label: d.record_label,
+            total_track: d.total_track,
+            duration: d.duration,
+            format: d.format,
+            price: d.price,
+          });
+          form.setFieldsValue({
+            album_name: d.album_name,
+            singer: d.singer,
+            composer_name: d.composer_name,
+            launch_date: moment(d.launch_date, "YYYY-MM-DD"),
+            place: d.place,
+            genre: d.genre,
+            record_label: d.record_label,
+            total_track: d.total_track,
+            duration: moment(d.duration, "HH:mm:ss"),
+            format: d.format,
+            price: d.price,
+          });
+        }
+      });
+  }, [data.length]);
+
+  let mId;
   const onFinish = () => {
-    if (id) {
-      dispatch(addMusicCd(formData));
-      navigate(`/sellerProfile/${id}`);
-    }else
-    {console.log("id not found")}
+    mId = Number(id);
+    dispatch(editMusicCd({ formData, mId }));
+    navigate(`/sellerProfile/${localStorage.getItem('id')}`)
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-
   return (
-    <Flex justify="center" className="form-container" >
+    <Flex justify="center" style={{ marginTop: "20px" }}>
       <Form
-        name="basic"
+        name="Edit Music Cds"
+        form={form}
         labelCol={{
           span: 10,
         }}
@@ -63,7 +102,6 @@ function AddMusicCDs() {
         initialValues={{
           remember: true,
         }}
-
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         onFinish={onFinish}
@@ -75,14 +113,11 @@ function AddMusicCDs() {
             {
               required: true,
               message: "Please input Album Name!",
-            }, { whitespace: true }, {
-              min: 2
-            }, { validator: (_, value) => {
-              if (!/^[a-zA-Z ]+$/.test(value)) {
-                return Promise.reject('Album name should only contain alphabetic characters');
-              }
-              return Promise.resolve();
-            } }
+            },
+            { whitespace: true },
+            {
+              min: 2,
+            },
           ]}
           hasFeedback
         >
@@ -102,15 +137,9 @@ function AddMusicCDs() {
             {
               required: true,
               message: "Please input singer name!",
-            },{
-              validator :(_, value) => {
-                if (!/^[a-zA-Z/ ]+$/.test(value)) {
-                  return Promise.reject('Singer name should only contain alphabetic characters');
-                }
-                return Promise.resolve();
-              }
-            }
-          ]} hasFeedback
+            },
+          ]}
+          hasFeedback
         >
           <Input
             placeholder="singer name"
@@ -130,13 +159,8 @@ function AddMusicCDs() {
               required: true,
               message: "Please input composer name!",
             },
-            {validator:(_, value) => {
-              if (!/^[a-zA-Z,& ]+$/.test(value)) {
-                return Promise.reject('Composer name should only contain alphabetic characters');
-              }
-              return Promise.resolve();
-            }}
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
           <Input
             placeholder="composer name"
@@ -147,6 +171,9 @@ function AddMusicCDs() {
             }}
           />
         </Form.Item>
+
+
+
         <Form.Item
           label="Launch Date"
           name="launch_date"
@@ -155,16 +182,22 @@ function AddMusicCDs() {
               required: true,
               message: "Please select launch date!",
             },
-          ]} hasFeedback
+          ]}
+          getValueFromEvent={(e) => e?.format("YYYY-MM-DD")}
+          getValueProps={(e) => ({
+            value: e ? dayjs(e) : "",
+          })}
+          hasFeedback
         >
           <DatePicker
             picker="date"
             name="launch_date"
             value={formData.launch_date}
             onChange={(date, dateString) => {
-              setFormData({ ...formData, launch_date: dateString })
+              setFormData({ ...formData, launch_date: dateString });
+              console.log(dateString)
             }}
-            format={"YYYY-MM-DD"}
+
             placeholder="please select launch date"
           />
         </Form.Item>
@@ -177,7 +210,8 @@ function AddMusicCDs() {
               required: true,
               message: "Please input place!",
             },
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
           <Input
             placeholder="place name"
@@ -197,7 +231,8 @@ function AddMusicCDs() {
               required: true,
               message: "Please select!",
             },
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
           <Select
             name="genre"
@@ -220,7 +255,8 @@ function AddMusicCDs() {
               required: true,
               message: "Please input record label!",
             },
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
           <Input
             placeholder="reacord label"
@@ -234,21 +270,21 @@ function AddMusicCDs() {
 
         <Form.Item
           label="Total Track"
-          name="total track"
+          name="total_track"
           rules={[
             {
               required: true,
               message: "Please input total track!",
             },
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
-          <InputNumber
-            min={1}
+          <Input
             placeholder="total track"
             name="total_track"
             value={formData.total_track}
-            onChange={(value) => {
-              setFormData({ ...formData, total_track: value });
+            onChange={(e) => {
+              setFormData({ ...formData, total_track: e.target.value });
             }}
           />
         </Form.Item>
@@ -259,32 +295,32 @@ function AddMusicCDs() {
           rules={[
             {
               required: true,
-              message: 'select an duration of your music cds'
+              message: "select an duration of your music cds",
             },
           ]}
+
           hasFeedback
         >
           <TimePicker
-            name='duration'
+            name="duration"
+            format={"HH:mm:ss"}
             value={formData.duration}
             onChange={(time, timeString) => {
-              setFormData({ ...formData, duration: timeString })
-              console.log(timeString)
+              setFormData({ ...formData, duration: timeString });
+              console.log(timeString);
             }}
           />
         </Form.Item>
 
-        <Form.Item label="Format" name="format"
-          rules={[
-            {
-              required: true,
-              message: 'select an format'
-            }
-          ]} hasFeedback
+        <Form.Item
+          label="Format"
+          name="format"
+          rules={[{ required: true, message: "select an format" }]}
+          hasFeedback
         >
           <Select
             onChange={(value) => {
-              setFormData({ ...formData, format: value })
+              setFormData({ ...formData, format: value });
             }}
             value={formData.format}
             placeholder="select music format"
@@ -296,6 +332,7 @@ function AddMusicCDs() {
             <Select.Option value="mp3">MP3</Select.Option>
             <Select.Option value="wma">WMA</Select.Option>
           </Select>
+
         </Form.Item>
         <Form.Item
           label="Price"
@@ -305,13 +342,17 @@ function AddMusicCDs() {
               required: true,
               message: "Please input price",
             },
-          ]} hasFeedback
+          ]}
+          hasFeedback
         >
-          <InputNumber min={1} name="price"
+          <InputNumber
+            min={1}
+            name="price"
             value={formData.price}
             onChange={(value) => {
-              setFormData({ ...formData, price: value })
-            }} />
+              setFormData({ ...formData, price: value });
+            }}
+          />
         </Form.Item>
 
         <Form.Item
@@ -321,7 +362,7 @@ function AddMusicCDs() {
           }}
         >
           <Button type="primary" htmlType="submit">
-            Add
+            Update
           </Button>
         </Form.Item>
       </Form>
@@ -329,4 +370,4 @@ function AddMusicCDs() {
   );
 }
 
-export default AddMusicCDs;
+export default EditMusicCds;

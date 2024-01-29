@@ -1,168 +1,160 @@
-import { useRef, useState } from "react";
-import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Space, Table } from "antd";
-// import Highlighter from "react-highlight-words";
-
+import { Col, Table } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import {  allMusic } from "../redux/MusicCds/MusicCdsSlice";
+import Search from "antd/es/input/Search";
+import './style.css'
 function AllMusicList() {
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-    },
-    {
-      key: "2",
-      name: "Joe Black",
-      age: 42,
-      address: "London No. 1 Lake Park",
-    },
-    {
-      key: "3",
-      name: "Jim Green",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-    },
-    {
-      key: "4",
-      name: "Jim Red",
-      age: 32,
-      address: "London No. 2 Lake Park",
-    },
-  ];
-
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
-  const searchInput = useRef(null);
-
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setSearchText("");
-  };
-  const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({
-                closeDropdown: false,
-              });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        text
-      ) : (
-        text
-      ),
-  });
+  const dispatch=useDispatch();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState(null);
+  useEffect(()=>{
+    dispatch(allMusic());
+    if (searchQuery === "") {
+      setFilteredData(null);
+    } else {
+      handleSearch(searchQuery);
+    }
+  },[searchQuery])
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      width: "30%",
-      ...getColumnSearchProps("name"),
+      title: 'Album',
+      width: 100,
+      dataIndex: 'album_name',
+      key: 'album_name',
+      fixed: 'left',
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-      width: "20%",
-      ...getColumnSearchProps("age"),
+      title: 'Singer',
+      width: 100,
+      dataIndex: 'singer',
+      key: 'singer',
+      fixed: 'left',
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-      ...getColumnSearchProps("address"),
-      sorter: (a, b) => a.address.length - b.address.length,
-      sortDirections: ["descend", "ascend"],
-    }
+      title: 'Composer',
+      dataIndex: 'composer_name',
+      key: 'composer_name',
+      width: 150,
+    },
+    {
+      title: 'Launch Date',
+      dataIndex: 'launch_date',
+      key: 'launch_date',
+      width: 150,
+    },
+    {
+      title: 'Place',
+      dataIndex: 'place',
+      key: 'place',
+      width: 150,
+    },
+    {
+      title: 'Genre',
+      dataIndex: 'genre',
+      key: 'genre',
+      width: 150,
+    },
+    {
+      title: 'Record Label',
+      dataIndex: 'record_label',
+      key: 'record_label',
+      width: 150,
+    },
+    {
+      title: 'Total Tracks',
+      dataIndex: 'total_track',
+      key: 'total_track',
+      width: 150,
+    },
+    {
+      title: 'Duration',
+      dataIndex: 'duration',
+      key: 'duration',
+      width: 150,
+    },
+    {
+      title: 'Music CD format',
+      dataIndex: 'format',
+      key: 'format',
+      width: 200,
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      width: 150,
+    },
+    {
+      title: 'Seller Name',
+      dataIndex: 'seller_name',
+      key: 'seller_name',
+      width: 150,
+    },
   ];
-  return <Table columns={columns} dataSource={data} />;
-}
+  // Function to handle search
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+
+    // Filter the data based on the search query
+    const filtered = data.filter(
+      (item) =>
+        item.album_name.toLowerCase().includes(value.toLowerCase()) ||
+        item.singer.toLowerCase().includes(value.toLowerCase()) ||
+        item.composer_name.toLowerCase().includes(value.toLowerCase()) ||
+        item.place.toLowerCase().includes(value.toLowerCase()) ||
+        item.genre.toLowerCase().includes(value.toLowerCase()) ||
+        item.record_label.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered);
+  };
+  
+  const Details = useSelector((state)=>state.musicCd.musicCdsDetail) ;
+  const Seller = useSelector((state)=>state.musicCd.seller)
+
+  const data =Array.isArray(Details) && Details.map((musicCd)=>{
+          return {
+        key:musicCd.musicCd_id,
+        album_name:musicCd.album_name,
+        singer:musicCd.singer,
+        composer_name:musicCd.composer_name,
+        launch_date:musicCd.launch_date.split("T")[0],
+        place:musicCd.place,
+        genre:musicCd.genre,
+        record_label:musicCd.record_label,
+        total_track:musicCd.total_track,
+        duration:musicCd.duration,
+        format:musicCd.format,
+        price:musicCd.price,
+        // UserId:musicCd.UserId,
+        seller_name:Seller.map((seller)=>
+            (musicCd.UserId === seller.id)?seller.username:""
+        )
+        
+      }
+
+  });
+ return (
+    <>
+    <div className="container">
+      <Col>
+      <Search className="search"
+            placeholder="Search by album name, artist, composer, etc."
+            allowClear
+            enterButton="Search"
+            size="large"
+            onSearch={handleSearch}
+          />
+      </Col>
+    
+    <Table
+    className="music-data"
+      columns={columns}
+      dataSource={filteredData || data}
+      
+    />
+    </div>
+    </>
+)}
 
 export default AllMusicList;

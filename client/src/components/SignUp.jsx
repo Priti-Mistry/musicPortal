@@ -1,34 +1,35 @@
 import { useState } from 'react'
 import { Button, Form, Input, Flex, Anchor } from 'antd';
-import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+import { signUp } from '../redux/auth/authSlice';
+import './style.css'
+
 
 function SignUp() {
     const [formData, setFormData] = useState({
-        name: '',
+        username: '',
         email: '',
         password: ''
         
     });
+    const dispatch=useDispatch();
+    const navigate = useNavigate()
     const onFinish = (values) => {
-        axios.post('http://127.0.0.1:5000/signup',{
-            username:formData.name,
-            email:formData.email,
-            password:formData.password
-        })
-        .then((res)=>{
-            console.log(res.data)
-        }).catch((err)=>{
-            alert(err)
-        })
+       dispatch(signUp(formData)).then(()=>{
         console.log('Success:', values);
-        console.log(formData);
+        navigate("/signin")
+       }
+       ).catch((err)=>{
+        console.log(err)
+       })
+       
     };
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
     return (
-        <Flex justify='center' style={{ marginTop: '20px' }}>
+        <Flex justify='center' className='form-container'>
             <Form
                 name="basic"
                 labelCol={{
@@ -54,12 +55,14 @@ function SignUp() {
                         {
                             required: true,
                             message: 'Please input your username!',
-                        },
-                    ]}
+                        },{
+                            min:5
+                        }
+                    ]}hasFeedback
                 >
                     <Input placeholder="YourName"
                         value={formData.name}
-                        onChange={(e) => { setFormData({ ...formData, name: e.target.value }) }}
+                        onChange={(e) => { setFormData({ ...formData, username: e.target.value }) }}
                     />
                 </Form.Item>
                 <Form.Item
@@ -69,8 +72,10 @@ function SignUp() {
                         {
                             required: true,
                             message: 'Please input your email!',
-                        },
-                    ]}
+                        },{
+                            type:"email"
+                        }
+                    ]}hasFeedback
                 >
                     <Input placeholder="youMail@gmail.com"
                         value={formData.email}
@@ -85,8 +90,10 @@ function SignUp() {
                         {
                             required: true,
                             message: 'Please input your password!',
-                        },
-                    ]}
+                        },{
+                            min:5
+                        },{max:15}
+                    ]}hasFeedback
                 >
                     <Input.Password placeholder="******"
                         value={formData.password}
@@ -101,7 +108,7 @@ function SignUp() {
                     }}
                 >
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Sign Up
                     </Button>
                     <Anchor>
                         <Link to="/signin">Already have an Account</Link>

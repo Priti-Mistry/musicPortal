@@ -1,0 +1,28 @@
+.container{
+    height: 85vh;
+}
+.music-data{
+    margin-top: 10px;
+}
+.search{
+    display: flex;
+    width: 30%;
+    justify-items: right;
+    align-self:end;
+}
+.form-container{
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+}
+.contentStyle{
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 85vh;
+}
+.footer{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}

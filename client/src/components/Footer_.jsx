@@ -1,12 +1,9 @@
 import { Footer } from "antd/es/layout/layout"
+import './style.css'
 
 function Footer_() {
   return (
-    <Footer
-        style={{
-          textAlign: 'center',
-        }}
-      >
+    <Footer className="footer" >
         Music Portal ©{new Date().getFullYear()} Created by Priti Mistry
       </Footer>
   )
