@@ -20,34 +20,6 @@ app.get('/',(req,res)=>{
 app.use('/users',userRouter)
 app.use('/MusicCds',musicRouter)
 
-// app.post('/add/musicCd',ValidateToken, (req, res) => {
-//     const { album_name, singer, composer_name,launch_date, place, genre,record_label, total_track,duration, format,price} = req.body;
-    
-//         MusicCds.create({
-//             album_name:album_name,
-//             singer:singer,
-//             composer_name:composer_name,
-//             launch_date:launch_date,
-//             place:place, 
-//             genre:genre,
-//             record_label:record_label, 
-//             total_track:total_track,
-//             duration:duration, 
-//             format:format,
-//             price:format
-//         }).then(() => {
-//             res.json({ message: "success" })
-//         })
-//             .catch((err) => {
-//                 if (err) {
-//                     res.status(400).json({
-//                         error: err
-//                     })
-//                 }
-//             })
-    
-// })
-
 const port = 5000
 db.sequelize.sync().then(() => {
     app.listen(port, () => {
